@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gis.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.gis.entity.User">
+        <result column="userid" jdbcType="INTEGER" property="userid"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="sex" jdbcType="VARCHAR" property="sex"/>
+    </resultMap>
+    <!--方法1：嵌套结果-->
+    <resultMap id="BasePlusResultMap" type="com.gis.entity.User">
+        <result column="{userid=userid}" jdbcType="INTEGER" property="userid"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="sex" jdbcType="VARCHAR" property="sex"/>
+        <collection column="{attributeid=attributeid}" property="attributes" ofType="com.gis.entity.Attributes" select="SelAttribute">
+        </collection>
+    </resultMap>
+    <resultMap id="AttributeResultMap" type="com.gis.entity.Attributes">
+        <result column="attributeid" jdbcType="INTEGER" property="attributeid"/>
+        <result column="attributename" jdbcType="VARCHAR" property="attributename"/>
+    </resultMap>
+    <!--<select id="Sel" resultType="com.gis.entity.User">-->
+        <!--SELECT userid,username,phone,sex FROM User WHERE userid = #{userid}-->
+    <!--</select>-->
+    <select id="SelAttribute" resultMap="AttributeResultMap">
+        SELECT attributeid,attributename FROM Attributes WHERE attributeid = #{attributeid}
+    </select>
+    <select id="Sel" resultMap="BasePlusResultMap">
+        SELECT u.userid, u.username, u.phone, u.sex, a.attributeid,a.attributename FROM  User u, Attributes a WHERE u.userid = #{userid} AND a.attributeid = #{attributeid}
+    </select>
+    <!--map<Long,User>-->
+    <select id="SelAllMapUser"  resultMap="BaseResultMap">
+        SELECT userid,username,phone,sex FROM User
+    </select>
+    <!--map<Long,map<String,User>>-->
+    <select id="selAllMapValueMapUser"  resultType="map">
+        SELECT userid,username,phone,sex FROM User
+    </select>
+</mapper>
